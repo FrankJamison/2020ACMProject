@@ -1,0 +1,9 @@
+C:\GitHub\Coursework\Pluralsight\Object-Oriented Programming Fundamentals in C#\ACM\ACM.BL\bin\Debug\netstandard2.0\ACM.BL.deps.json
+C:\GitHub\Coursework\Pluralsight\Object-Oriented Programming Fundamentals in C#\ACM\ACM.BL\bin\Debug\netstandard2.0\ACM.BL.dll
+C:\GitHub\Coursework\Pluralsight\Object-Oriented Programming Fundamentals in C#\ACM\ACM.BL\bin\Debug\netstandard2.0\ACM.BL.pdb
+C:\GitHub\Coursework\Pluralsight\Object-Oriented Programming Fundamentals in C#\ACM\ACM.BL\obj\Debug\netstandard2.0\ACM.BL.csprojAssemblyReference.cache
+C:\GitHub\Coursework\Pluralsight\Object-Oriented Programming Fundamentals in C#\ACM\ACM.BL\obj\Debug\netstandard2.0\ACM.BL.csproj.CoreCompileInputs.cache
+C:\GitHub\Coursework\Pluralsight\Object-Oriented Programming Fundamentals in C#\ACM\ACM.BL\obj\Debug\netstandard2.0\ACM.BL.AssemblyInfoInputs.cache
+C:\GitHub\Coursework\Pluralsight\Object-Oriented Programming Fundamentals in C#\ACM\ACM.BL\obj\Debug\netstandard2.0\ACM.BL.AssemblyInfo.cs
+C:\GitHub\Coursework\Pluralsight\Object-Oriented Programming Fundamentals in C#\ACM\ACM.BL\obj\Debug\netstandard2.0\ACM.BL.dll
+C:\GitHub\Coursework\Pluralsight\Object-Oriented Programming Fundamentals in C#\ACM\ACM.BL\obj\Debug\netstandard2.0\ACM.BL.pdb

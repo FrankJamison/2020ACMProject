@@ -1,0 +1,10 @@
+d:\Programming\C#\2020-Pluralsight-ACMProject\ACM.BL\bin\Release\netstandard2.0\ACM.BL.deps.json
+d:\Programming\C#\2020-Pluralsight-ACMProject\ACM.BL\bin\Release\netstandard2.0\ACM.BL.dll
+d:\Programming\C#\2020-Pluralsight-ACMProject\ACM.BL\bin\Release\netstandard2.0\ACM.BL.pdb
+d:\Programming\C#\2020-Pluralsight-ACMProject\ACM.BL\obj\Release\netstandard2.0\ACM.BL.csproj.AssemblyReference.cache
+d:\Programming\C#\2020-Pluralsight-ACMProject\ACM.BL\obj\Release\netstandard2.0\ACM.BL.GeneratedMSBuildEditorConfig.editorconfig
+d:\Programming\C#\2020-Pluralsight-ACMProject\ACM.BL\obj\Release\netstandard2.0\ACM.BL.AssemblyInfoInputs.cache
+d:\Programming\C#\2020-Pluralsight-ACMProject\ACM.BL\obj\Release\netstandard2.0\ACM.BL.AssemblyInfo.cs
+d:\Programming\C#\2020-Pluralsight-ACMProject\ACM.BL\obj\Release\netstandard2.0\ACM.BL.csproj.CoreCompileInputs.cache
+d:\Programming\C#\2020-Pluralsight-ACMProject\ACM.BL\obj\Release\netstandard2.0\ACM.BL.dll
+d:\Programming\C#\2020-Pluralsight-ACMProject\ACM.BL\obj\Release\netstandard2.0\ACM.BL.pdb

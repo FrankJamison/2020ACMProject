@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "d:\\Programming\\C#\\2020-Pluralsight-ACMProject\\ACM.BL\\ACM.BL.csproj": {}
+    "d:\\Programming\\C#\\2020PluralsightACMProject\\ACM.BL\\ACM.BL.csproj": {}
   },
   "projects": {
-    "d:\\Programming\\C#\\2020-Pluralsight-ACMProject\\ACM.BL\\ACM.BL.csproj": {
+    "d:\\Programming\\C#\\2020PluralsightACMProject\\ACM.BL\\ACM.BL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "d:\\Programming\\C#\\2020-Pluralsight-ACMProject\\ACM.BL\\ACM.BL.csproj",
+        "projectUniqueName": "d:\\Programming\\C#\\2020PluralsightACMProject\\ACM.BL\\ACM.BL.csproj",
         "projectName": "ACM.BL",
-        "projectPath": "d:\\Programming\\C#\\2020-Pluralsight-ACMProject\\ACM.BL\\ACM.BL.csproj",
+        "projectPath": "d:\\Programming\\C#\\2020PluralsightACMProject\\ACM.BL\\ACM.BL.csproj",
         "packagesPath": "C:\\Users\\frank\\.nuget\\packages\\",
-        "outputPath": "d:\\Programming\\C#\\2020-Pluralsight-ACMProject\\ACM.BL\\obj\\",
+        "outputPath": "d:\\Programming\\C#\\2020PluralsightACMProject\\ACM.BL\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\frank\\AppData\\Roaming\\NuGet\\NuGet.Config",

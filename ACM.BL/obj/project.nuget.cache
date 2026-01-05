@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "b43EjwJuta4=",
+  "dgSpecHash": "qTLyPYw6IUo=",
   "success": true,
-  "projectFilePath": "d:\\Programming\\C#\\2020-Pluralsight-ACMProject\\ACM.BL\\ACM.BL.csproj",
+  "projectFilePath": "d:\\Programming\\C#\\2020PluralsightACMProject\\ACM.BL\\ACM.BL.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\frank\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
     "C:\\Users\\frank\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512"

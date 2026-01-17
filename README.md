@@ -1,10 +1,11 @@
 # 2020ACMProject — ACM Business Layer (C#/.NET)
 
-This repo is a small, intentionally focused **business-layer class library** with **unit tests**.
+This repository is a small, intentionally focused **business-layer class library** with **unit tests**.
 
-It’s not a full app (no UI, no database, no API). That’s on purpose: the goal is to demonstrate clean C# fundamentals—domain modeling, lightweight business rules, and a testable seam where persistence would go.
+It’s not a full application (no UI, no database, no API). That’s not missing work—it’s scoped work.
+This code is the kind of “quiet middle layer” you want in a real system: readable, testable, and hard to break by accident.
 
-If you’re an employer or recruiter: this is a “read-the-code” project. The interesting parts are the design choices and tests, not the number of screens.
+If you’re an employer or recruiter: the best use of your time is skimming the tests, then reading the `CustomerRepository`/`Customer` code.
 
 ---
 
@@ -17,23 +18,51 @@ If you’re an employer or recruiter: this is a “read-the-code” project. The
   - `Tests/ACM.BLTest` → unit tests (**MSTest**, **.NET Framework 4.7.2**, `net472`)
 - **Patterns**: Repository pattern (with a small example of repository composition)
 - **Testing focus**: computed behavior, validation rules, and repository retrieval
+- **Philosophy**: small surface area, high signal-to-noise
 
 ---
 
 ## Who this README is for
 
-- **Employers / recruiters**: a quick map of what skills and design thinking this code demonstrates.
-- **Developers**: exactly where to look, how to build/test, and why the code is structured this way.
+- **Employers / recruiters**: the “what skills does this prove?” view
+- **Developers**: the “how does this work, how do I run it, where do I look?” view
 
 ---
 
-## What this demonstrates (hiring-focused)
+## What this demonstrates (employer-friendly)
 
-- **Object-oriented design**: POCO entities, constructors that establish invariants, and encapsulation where appropriate.
-- **Business-rule placement**: basic validation lives close to the domain model (not in UI, not in repositories).
-- **Testability**: behavior is deterministic and verified via unit tests.
-- **Separation of concerns**: repositories act as a seam for persistence without polluting domain logic.
-- **Pragmatism**: intentionally small scope, intentionally readable code.
+- **OOP fundamentals**: POCO entities, constructors, encapsulation, and computed properties
+- **Business-rule placement**: basic validation lives in the domain model, not UI glue
+- **Testability**: behavior is deterministic and covered by unit tests
+- **Separation of concerns**: repositories provide a seam for persistence without contaminating the domain
+- **Maintainer empathy**: code is written for humans, not for “clever points”
+
+---
+
+## Repository map
+
+```text
+2020ACMProject.sln
+ACM.BL/                 # Business-layer library (netstandard2.0)
+  Address.cs
+  Customer.cs
+  Order.cs
+  OrderItem.cs
+  Product.cs
+  AddressRepository.cs
+  CustomerRepository.cs
+  OrderRepository.cs
+  ProductRepository.cs
+
+Tests/ACM.BLTest/       # MSTest unit tests (net472)
+  CustomerTest.cs
+  CustomerRepositoryTest.cs
+  ProductRepositoryTest.cs
+  OrderRepositoryTest.cs
+
+.vscode/tasks.json      # VS Code build/test tasks
+packages/               # MSTest adapter/framework packages (packages.config style)
+```
 
 ---
 
@@ -53,32 +82,36 @@ This is a “core business layer” slice:
 └────────────────────┘
 ```
 
-The repositories currently return **hard-coded sample data**. That’s deliberate: it keeps the project focused on structure and behavior, and it keeps tests fast and stable.
+The repositories currently return **hard-coded sample data**. That’s deliberate:
+
+- Keeps the project about design and behavior (not about wiring)
+- Keeps tests fast, deterministic, and “no setup required”
+- Creates a clean seam where a real data access layer could be plugged in later
 
 ---
 
-## Design & development details
+## Design & development elements (the detailed tour)
 
-### Domain entities (POCOs with “just enough” behavior)
+### 1) Domain entities (POCOs with “just enough” behavior)
 
-The `ACM.BL` project includes:
+The `ACM.BL` project contains the domain model:
 
 - `Customer` — identity, contact info, computed display name, validation, plus an address list
 - `Address` — address fields + basic validation
-- `Product` — product info + pricing + validation
+- `Product` — product info + price + validation
 - `Order` / `OrderItem` — order metadata, line items, and validation
 
-Notable design choices:
+Design choices (and why they exist):
 
-- **Computed property**: `Customer.FullName` builds a display-friendly value and gracefully handles missing name parts.
+- **Computed property**: `Customer.FullName` builds a display-friendly value and handles missing name parts.
 - **Constructor invariants**:
   - `Customer(int customerId)` sets `CustomerID` and initializes `AddressList`.
   - `Order(int orderId)` initializes `OrderItems`.
 - **Nullable types** (`decimal?`, `DateTimeOffset?`) model “not set yet” without magic values.
 
-### Validation
+### 2) Validation approach
 
-Each entity has a `Validate()` method implementing straightforward business rules:
+Each entity has a `Validate()` method implementing straightforward rules:
 
 - `Customer.Validate()` → requires `LastName` and `EmailAddress`
 - `Address.Validate()` → requires `PostalCode`
@@ -86,11 +119,14 @@ Each entity has a `Validate()` method implementing straightforward business rule
 - `Order.Validate()` → requires `OrderDate`
 - `OrderItem.Validate()` → requires `Quantity > 0`, `ProductID > 0`, and `PurchasePrice`
 
-This is intentionally not a full validation framework (no error list, no localization, no async rules). It’s a clean baseline that’s easy to test and easy to extend.
+What this is (and isn’t):
 
-### Repository pattern (and a small example of composition)
+- ✅ Simple, UI-agnostic, unit-testable rules
+- ❌ Not a full validation framework (no error lists, no localization, no async checks)
 
-Repositories are the seam where a real data-access layer could be plugged in later.
+### 3) Repository pattern (with a small example of composition)
+
+Repositories provide a seam where persistence could be swapped in later:
 
 - `CustomerRepository.Retrieve(int)` returns a populated `Customer` for a known ID
 - `AddressRepository.RetrieveByCustomerID(int)` returns a stable list of addresses
@@ -101,21 +137,54 @@ Composition example:
 
 - `CustomerRepository` uses `AddressRepository` to populate `Customer.AddressList`.
 
-Also worth noting: `OrderRepository` seeds an order date using the **current year** (to keep sample data relevant across calendar years) while preserving determinism within a given year.
+One small “real world” touch:
 
----
+- `OrderRepository` uses the **current year** when seeding sample data so it stays relevant as time passes, while still being deterministic for that year.
 
-## Testing strategy
+### 4) Testing strategy
 
 Tests live in `Tests/ACM.BLTest` and use **MSTest**.
 
-Coverage focuses on:
+The suite intentionally covers three categories:
 
-- **Computed behavior**: `Customer.FullName` variants (first/last missing)
-- **Business rules**: `Customer.Validate()` positive and negative cases
-- **Repository retrieval**: verifying returned objects are correctly populated, including address lists
+- **Computed behavior**: `Customer.FullName` variations
+- **Business rules**: `Validate()` positive and negative cases
+- **Repository retrieval**: returned objects are populated correctly (including address lists)
 
-Tests follow an Arrange/Act/Assert style and are written to be readable by humans (including future humans).
+The tests follow Arrange/Act/Assert and prioritize readability.
+
+### 5) Build + dependency model
+
+This repo intentionally demonstrates a common enterprise mix:
+
+- Library: `netstandard2.0`
+- Tests: `net472`
+
+The test project uses the older `packages.config` style and a checked-in `packages/` folder for:
+
+- `MSTest.TestAdapter` (1.3.2)
+- `MSTest.TestFramework` (1.3.2)
+
+That’s not the newest approach, but it’s representative of legacy code you’ll maintain in the real world.
+
+### 6) VS Code tooling
+
+The repo includes VS Code tasks:
+
+- Build: `.NET: Build (Release)`
+- Tests: `.NET: VSTest (Release)`
+
+These are defined in `.vscode/tasks.json` and are wired to the renamed solution file.
+
+### 7) Source control hygiene
+
+The `.gitignore` is intentionally small and focused:
+
+- ignores build artifacts (`bin/`, `obj/`)
+- ignores Visual Studio cache (`.vs/`)
+- ignores test output (`TestResults/`)
+
+This keeps commits reviewable and keeps the repo from becoming a storage unit.
 
 ---
 
@@ -152,7 +221,7 @@ dotnet vstest .\Tests\ACM.BLTest\bin\Release\ACM.BLTest.dll --TestAdapterPath:.\
 
 ---
 
-## Code tour (where to look)
+## Code tour (start here)
 
 - `ACM.BL/Customer.cs` — computed `FullName`, validation, constructor invariants
 - `ACM.BL/CustomerRepository.cs` — repository composition via `AddressRepository`
@@ -171,13 +240,32 @@ dotnet vstest .\Tests\ACM.BLTest\bin\Release\ACM.BLTest.dll --TestAdapterPath:.\
 
 ---
 
-## If I extended this next
+## FAQ / troubleshooting
 
-- Add repository interfaces and introduce constructor injection
+<details>
+<summary><strong>Why doesn’t this “run” as an application?</strong></summary>
+
+This repo is a class library + tests. The “executable” is the test suite—run the tests to exercise the code paths.
+
+</details>
+
+<details>
+<summary><strong>My CLI test run fails because of .NET Framework targeting packs</strong></summary>
+
+The test project targets .NET Framework 4.7.2 (`net472`). Some environments require Visual Studio Build Tools / targeting packs installed for `dotnet test`.
+If you hit that, running tests from Visual Studio typically works out of the box.
+
+</details>
+
+---
+
+## If I extended this next (roadmap)
+
+- Introduce repository interfaces and constructor injection
 - Replace hard-coded data with persistence (EF Core / Dapper / API client)
 - Upgrade validation to return a list of errors (instead of `bool`) and add richer rules
-- Add real `Save(...)` behavior and test coverage
-- Add CI (GitHub Actions/Azure DevOps) to run build + tests on every push
+- Implement real `Save(...)` behavior and add test coverage
+- Add CI to run build + tests on every push
 
 ---
 

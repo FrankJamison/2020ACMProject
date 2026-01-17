@@ -1,142 +1,188 @@
-# ACM Business Layer (C#/.NET) — Portfolio Project
+# 2020ACMProject — ACM Business Layer (C#/.NET)
 
-A C# business-layer class library built as part of a Pluralsight-style ACM sample application. It focuses on **domain modeling**, **validation rules**, and the **Repository pattern**, backed by **MSTest** unit tests.
+This repo is a small, intentionally focused **business-layer class library** with **unit tests**.
 
-If you’re reviewing this for hiring, the goal is to demonstrate fundamentals: clean C# design, testable logic, and clear separation of concerns.
+It’s not a full app (no UI, no database, no API). That’s on purpose: the goal is to demonstrate clean C# fundamentals—domain modeling, lightweight business rules, and a testable seam where persistence would go.
 
-## What’s In This Repo
+If you’re an employer or recruiter: this is a “read-the-code” project. The interesting parts are the design choices and tests, not the number of screens.
 
-- **`ACM.BL`**: .NET Standard business-layer class library (`netstandard2.0`)
-- **`Tests/ACM.BLTest`**: MSTest unit test project targeting .NET Framework 4.7.2
+---
 
-## Technical Highlights
+## Quick facts (for busy humans)
 
-### Skills Demonstrated
+- **Language**: C#
+- **Solution**: `2020ACMProject.sln`
+- **Projects**:
+  - `ACM.BL` → business-layer library (**.NET Standard 2.0**, `netstandard2.0`)
+  - `Tests/ACM.BLTest` → unit tests (**MSTest**, **.NET Framework 4.7.2**, `net472`)
+- **Patterns**: Repository pattern (with a small example of repository composition)
+- **Testing focus**: computed behavior, validation rules, and repository retrieval
 
-- **C# / OOP**: constructors, encapsulation, computed properties, nullable types
-- **.NET**: .NET Standard 2.0 class library + .NET Framework 4.7.2 unit test project
-- **Design patterns**: Repository pattern, repository composition
-- **Testing**: MSTest unit tests validating both behavior and data mapping
-- **Clean code practices**: separation of concerns, readable and deterministic tests
+---
 
-### Domain Modeling (POCOs)
-The `ACM.BL` project contains plain C# domain entities designed for clarity and testability:
+## Who this README is for
 
-- **Customer**: identity, contact info, computed `FullName`, and validation
-- **Address**: address fields + basic validation
-- **Product**: name/description/pricing + validation
-- **Order / OrderItem**: order date, line items, and validation
+- **Employers / recruiters**: a quick map of what skills and design thinking this code demonstrates.
+- **Developers**: exactly where to look, how to build/test, and why the code is structured this way.
 
-Design notes:
+---
 
-- **Computed property**: `Customer.FullName` composes display-friendly names while handling missing parts.
-- **Encapsulation**: `Customer.CustomerID` / `Product.ProductID` are set via constructors (ID is not freely mutable).
-- **Nullable value usage**: prices and dates use nullable types (`decimal?`, `DateTimeOffset?`) to represent “unknown/not set” states cleanly.
+## What this demonstrates (hiring-focused)
 
-### Validation Logic
-Each entity exposes a `Validate()` method to keep basic business rules close to the data:
+- **Object-oriented design**: POCO entities, constructors that establish invariants, and encapsulation where appropriate.
+- **Business-rule placement**: basic validation lives close to the domain model (not in UI, not in repositories).
+- **Testability**: behavior is deterministic and verified via unit tests.
+- **Separation of concerns**: repositories act as a seam for persistence without polluting domain logic.
+- **Pragmatism**: intentionally small scope, intentionally readable code.
 
-- `Customer.Validate()` requires `LastName` and `EmailAddress`
-- `Product.Validate()` requires `ProductName` and `CurrentPrice`
-- `Order.Validate()` requires `OrderDate`
-- `OrderItem.Validate()` checks positive quantity/product ID and requires `PurchasePrice`
-- `Address.Validate()` requires `PostalCode`
+---
 
-These validations are intentionally lightweight and demonstrate how to structure business rules without UI dependencies.
+## Architecture at 10,000 ft
 
-### Repository Pattern (with Composition)
-Repositories encapsulate retrieval logic and act as a seam for later data-access replacement:
+This is a “core business layer” slice:
 
-- `CustomerRepository.Retrieve(int)` returns a populated customer (sample hard-coded data)
-- `ProductRepository.Retrieve(int)` returns a populated product (sample hard-coded data)
-- `OrderRepository.Retrieve(int)` returns an order with a stable date pattern
-- `AddressRepository.RetrieveByCustomerID(int)` returns multiple addresses for a customer
+```text
+┌────────────────────┐
+│      Tests         │  MSTest (net472)
+│  ACM.BLTest        │
+└─────────┬──────────┘
+          │ references
+┌─────────▼──────────┐
+│     ACM.BL         │  Business layer (netstandard2.0)
+│  Entities + Repos  │
+└────────────────────┘
+```
 
-A nice example of composition:
+The repositories currently return **hard-coded sample data**. That’s deliberate: it keeps the project focused on structure and behavior, and it keeps tests fast and stable.
 
-- `CustomerRepository` **depends on** `AddressRepository` to populate `Customer.AddressList`, demonstrating a repository collaborating with another data source.
+---
 
-### Unit Testing (MSTest)
-The test suite validates both business logic and repository results:
+## Design & development details
 
-- **Computed property tests**: `Customer.FullName` (normal case + missing first/last name)
-- **Validation tests**: `Customer.Validate()` including negative cases
-- **Repository tests**: `Retrieve(...)` tests for `CustomerRepository`, `ProductRepository`, and `OrderRepository`
+### Domain entities (POCOs with “just enough” behavior)
 
-The tests are deterministic and designed to demonstrate confidence in core behaviors.
+The `ACM.BL` project includes:
 
-## Getting Started
+- `Customer` — identity, contact info, computed display name, validation, plus an address list
+- `Address` — address fields + basic validation
+- `Product` — product info + pricing + validation
+- `Order` / `OrderItem` — order metadata, line items, and validation
+
+Notable design choices:
+
+- **Computed property**: `Customer.FullName` builds a display-friendly value and gracefully handles missing name parts.
+- **Constructor invariants**:
+  - `Customer(int customerId)` sets `CustomerID` and initializes `AddressList`.
+  - `Order(int orderId)` initializes `OrderItems`.
+- **Nullable types** (`decimal?`, `DateTimeOffset?`) model “not set yet” without magic values.
+
+### Validation
+
+Each entity has a `Validate()` method implementing straightforward business rules:
+
+- `Customer.Validate()` → requires `LastName` and `EmailAddress`
+- `Address.Validate()` → requires `PostalCode`
+- `Product.Validate()` → requires `ProductName` and `CurrentPrice`
+- `Order.Validate()` → requires `OrderDate`
+- `OrderItem.Validate()` → requires `Quantity > 0`, `ProductID > 0`, and `PurchasePrice`
+
+This is intentionally not a full validation framework (no error list, no localization, no async rules). It’s a clean baseline that’s easy to test and easy to extend.
+
+### Repository pattern (and a small example of composition)
+
+Repositories are the seam where a real data-access layer could be plugged in later.
+
+- `CustomerRepository.Retrieve(int)` returns a populated `Customer` for a known ID
+- `AddressRepository.RetrieveByCustomerID(int)` returns a stable list of addresses
+- `ProductRepository.Retrieve(int)` returns a populated `Product` for a known ID
+- `OrderRepository.Retrieve(int)` returns a populated `Order` for a known ID
+
+Composition example:
+
+- `CustomerRepository` uses `AddressRepository` to populate `Customer.AddressList`.
+
+Also worth noting: `OrderRepository` seeds an order date using the **current year** (to keep sample data relevant across calendar years) while preserving determinism within a given year.
+
+---
+
+## Testing strategy
+
+Tests live in `Tests/ACM.BLTest` and use **MSTest**.
+
+Coverage focuses on:
+
+- **Computed behavior**: `Customer.FullName` variants (first/last missing)
+- **Business rules**: `Customer.Validate()` positive and negative cases
+- **Repository retrieval**: verifying returned objects are correctly populated, including address lists
+
+Tests follow an Arrange/Act/Assert style and are written to be readable by humans (including future humans).
+
+---
+
+## Getting started
 
 ### Prerequisites
-- Visual Studio 2022 (or VS 2019) with .NET desktop build tools
-- OR the .NET SDK + Visual Studio Build Tools (for CLI builds)
+
+- Visual Studio 2019/2022 with .NET desktop build tools
+- Or the .NET SDK + build tools capable of compiling a .NET Framework 4.7.2 test project
 
 ### Build (Visual Studio)
-1. Open `2020-Pluralsight-ACMProject.sln`
+
+1. Open `2020ACMProject.sln`
 2. Build the solution
 
-### Run Tests (Visual Studio)
-- Use **Test Explorer** → **Run All**
+### Run tests (Visual Studio)
 
-### Build & Test (CLI)
+- Test Explorer → Run All
+
+### Build & test (CLI)
+
 From the repo root:
 
 ```powershell
-# Build the business-layer library
-dotnet build .\ACM.BL\ACM.BL.csproj -c Release
-
-# Run unit tests
-dotnet test .\Tests\ACM.BLTest\ACM.BLTest.csproj -c Release
+dotnet build .\2020ACMProject.sln -c Release
+dotnet test  .\Tests\ACM.BLTest\ACM.BLTest.csproj -c Release
 ```
 
-> Note: the unit test project targets .NET Framework 4.7.2. In some setups, `dotnet test` may require the .NET Framework targeting pack / VS build tools installed.
-
-### Run (CLI)
-This repository is a **class library** + **unit tests** (there’s no console/web executable to “run”). The intended way to execute the code paths is to run the test suite.
+If you prefer `vstest` directly:
 
 ```powershell
-# Run all tests
-dotnet test .\Tests\ACM.BLTest\ACM.BLTest.csproj
-
-# Run a single test class (substring match)
-dotnet test .\Tests\ACM.BLTest\ACM.BLTest.csproj --filter FullyQualifiedName~CustomerTest
-
-# Run a single test method (example)
-dotnet test .\Tests\ACM.BLTest\ACM.BLTest.csproj --filter FullyQualifiedName~CustomerTest.FullNameTestValid
+dotnet vstest .\Tests\ACM.BLTest\bin\Release\ACM.BLTest.dll --TestAdapterPath:.\packages\MSTest.TestAdapter.1.3.2\build\_common
 ```
 
-## Project Structure
+---
 
-```text
-ACM.BL/
-  Customer.cs
-  Address.cs
-  Product.cs
-  Order.cs
-  OrderItem.cs
-  CustomerRepository.cs
-  AddressRepository.cs
-  ProductRepository.cs
-  OrderRepository.cs
+## Code tour (where to look)
 
-Tests/ACM.BLTest/
-  CustomerTest.cs
-  CustomerRepositoryTest.cs
-  ProductRepositoryTest.cs
-  OrderRepositoryTest.cs
-```
+- `ACM.BL/Customer.cs` — computed `FullName`, validation, constructor invariants
+- `ACM.BL/CustomerRepository.cs` — repository composition via `AddressRepository`
+- `ACM.BL/AddressRepository.cs` — stable list retrieval for tests
+- `Tests/ACM.BLTest/CustomerTest.cs` — computed property + validation tests
+- `Tests/ACM.BLTest/CustomerRepositoryTest.cs` — retrieval + address list assertions
 
-## Portfolio Notes (What This Demonstrates)
+---
 
-- Object-oriented design: constructors, encapsulation, and computed properties
-- Business rule validation patterns
-- Repository pattern and repository composition
-- Unit testing fundamentals with MSTest
-- Separation of concerns: business logic isolated from UI/data store specifics
+## Tradeoffs (a.k.a. “things I did on purpose”)
 
-## Potential Next Improvements
-(If you decide to extend this repo later)
+- **Hard-coded repository data**: keeps examples and unit tests stable and fast.
+- **Lightweight validation**: avoids over-engineering; shows where richer validation could evolve.
+- **No DI container**: the surface area is small enough to keep construction explicit.
+- **Two target frameworks** (`netstandard2.0` + `net472`): demonstrates compatibility constraints you’ll see in real codebases.
 
-- Replace hard-coded repository data with a data access layer (EF Core/SQL/API)
-- Expand validation with richer rules and error reporting (e.g., returning a list of validation errors)
-- Add `Save(...)` test coverage and implement persistence
+---
+
+## If I extended this next
+
+- Add repository interfaces and introduce constructor injection
+- Replace hard-coded data with persistence (EF Core / Dapper / API client)
+- Upgrade validation to return a list of errors (instead of `bool`) and add richer rules
+- Add real `Save(...)` behavior and test coverage
+- Add CI (GitHub Actions/Azure DevOps) to run build + tests on every push
+
+---
+
+## Closing note
+
+This project is intentionally modest in scope: it’s a clean room to demonstrate code quality, design fundamentals, and tests.
+
+It’s the kind of code you want in the middle of a larger system—quietly correct, easy to read, and hard to break by accident.

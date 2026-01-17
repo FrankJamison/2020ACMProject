@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": ".NET: Build (Release)",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "2020ACMProject.sln",
+                "-c",
+                "Release",
+                "-v",
+                "minimal"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": ".NET: VSTest (Release)",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "vstest",
+                "Tests\\ACM.BLTest\\bin\\Release\\ACM.BLTest.dll",
+                "--TestAdapterPath:packages\\MSTest.TestAdapter.1.3.2\\build\\_common"
+            ],
+            "dependsOn": ".NET: Build (Release)",
+            "group": "test",
+            "problemMatcher": []
+        }
+    ]
+}
